@@ -1,57 +1,35 @@
 #include <Arduino.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "sensor.h"
 
-// DHT Temperature & Humidity Sensor
-// Unified Sensor Library Example
-// Written by Tony DiCola for Adafruit Industries
-// Released under an MIT license.
+#define DELAY_MS 1000
 
-// REQUIRES the following Arduino libraries:
-// - DHT Sensor Library: https://github.com/adafruit/DHT-sensor-library
-// - Adafruit Unified Sensor Lib: https://github.com/adafruit/Adafruit_Sensor
 
-#include <Adafruit_Sensor.h>
-#include <DHT.h>
-#include <DHT_U.h>
+void vSensorTask(void *pvParameters) {
+  sensor_init();
+  sensor_data_t data;
 
-#define DHTPIN 4    // Digital pin connected to the DHT sensor 
-// Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
-// Pin 15 can work but DHT must be disconnected during program upload.
-
-// Uncomment the type of sensor in use:
-//#define DHTTYPE    DHT11     // DHT 11
-#define DHTTYPE    DHT11     // DHT 22 (AM2302)
-//#define DHTTYPE    DHT21     // DHT 21 (AM2301)
-
-// See guide for details on sensor wiring and usage:
-//   https://learn.adafruit.com/dht/overview
-
-DHT_Unified dht(DHTPIN, DHTTYPE);
-
-uint32_t delayMS;
+  for (;;) {
+    if (sensor_get_data(&data) == ESP_OK) {
+      Serial.print(F(">Temperature: "));
+      Serial.println(data.temperature);
+      
+      Serial.print(F(">Humidity: "));
+      Serial.println(data.humidity);
+      
+      Serial.print(F(">Heat Index: "));
+      Serial.println(data.heat_index);
+    } else {
+      Serial.println(F("PANICO!"));
+    }
+    vTaskDelay(pdMS_TO_TICKS(DELAY_MS));
+  }
+}
 
 void setup() {
   Serial.begin(9600);
-  dht.begin();
-  delayMS =  1000;
+  xTaskCreate(vSensorTask, "Sensor Task", configMINIMAL_STACK_SIZE + sizeof(sensor_data_t) + 1024, NULL, 1, NULL);
 }
 
-void loop() {
-  delay(delayMS);
-  sensors_event_t event;
-  dht.temperature().getEvent(&event);
-  if (isnan(event.temperature)) {
-    Serial.println(F("Error reading temperature!"));
-  }
-  else {
-    Serial.print(F(">Temperature:"));
-    Serial.println(event.temperature);
-  }
-  dht.humidity().getEvent(&event);
-  if (isnan(event.relative_humidity)) {
-    Serial.println(F("Error reading humidity!"));
-  }
-  else {
-    Serial.print(F(">Humidity:"));
-    Serial.println(event.relative_humidity);
-  }
-}
+void loop() {}
