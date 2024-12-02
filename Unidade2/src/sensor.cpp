@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <DHT.h>
+#include <Adafruit_Sensor.h>
+
 #include "esp_check.h"
 #include "sensor.h"
 
