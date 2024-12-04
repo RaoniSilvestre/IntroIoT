@@ -1,7 +1,6 @@
 #pragma once
 
 #include "esp_err.h"
-#include "secrets.h"
 
 esp_err_t mqtt_init();
 esp_err_t mqtt_connect();
