@@ -3,8 +3,8 @@
 #include "esp_check.h"
 #include "config.h"
 #include "secrets.h"
-#include "wifi_handle.h"
-#include "mqtt.h"
+#include "wifi_h.h"
+#include "mqtt_c.h"
 #include "file_sys.h"
 
 PubSubClient mqtt_client(wifi_client);
@@ -14,16 +14,16 @@ esp_err_t mqtt_init() {
     log("Iniciando cliente MQTT");
 
     mqtt_client.setServer(MQTT_SERVER, MQTT_PORT);
-    ESP_GOTO_ON_ERROR(mqtt_connect(), err, "MQTT", "Falha ao se conectar com o broker MQTT");
-
-    return ESP_OK;
-err:
-    // XXX PÂNICO
-    log("Falha ao se conectar com o broker MQTT.");
+    ret = ESP_OK;
     return ret;
 }
 
 esp_err_t mqtt_connect() {
+    if (mqtt_client.connected()) {
+        Serial.println("Cliente MQTT já conectado.");
+        return ESP_OK;
+    }
+
     Serial.println(F("Conectando ao broker MQTT"));
 
     uint32_t start = millis();
@@ -33,9 +33,10 @@ esp_err_t mqtt_connect() {
         Serial.println(mqtt_client.state());
 
         if (mqtt_client.connect(CLIENT_ID, MQTT_USER, MQTT_KEY)) {
-            log("MQTT conectado.");
+            Serial.println("MQTT conectado.");
             return ESP_OK;
         }
+        Serial.println("aqui.");
         vTaskDelay(pdMS_TO_TICKS(100));
     }
     
@@ -53,7 +54,7 @@ esp_err_t mqtt_publish(const char *topic, const char *payload) {
     }
 
     ESP_GOTO_ON_FALSE(mqtt_client.publish(topic, payload), ESP_FAIL, err_pub, "MQTT", "Não foi possível publicar a mensagem");
-    log((String("Publicação feita no tópico ") + String(topic)).c_str());
+    Serial.println((String("Publicação feita no tópico ") + String(topic)).c_str());
     return ESP_OK;
 
 err_pub:
@@ -62,10 +63,9 @@ err_pub:
     return ESP_FAIL;
 }
 
-char *mqtt_get_topic(const char *subtopic) {
-    char *topic = (char *)malloc(strlen(CLIENT_ID) + strlen(subtopic) + 1);
-    strcat(strcat(topic, CLIENT_ID), subtopic);
-    return topic;
+char *mqtt_get_topic(char *src, const char *subtopic) {
+    strcat(strcat(src, CLIENT_ID), subtopic);
+    return src;
 }
 
 void mqtt_pool() {

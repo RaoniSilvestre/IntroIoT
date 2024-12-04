@@ -1,9 +1,9 @@
 #include <file_sys.h>
 
-#define LOG_FILE "logs.txt"
-#define HEAT_DATA_FILE "heat_data.txt"
-#define TEMPERATURE_DATA_FILE "temperature_data.txt"
-#define HUMIDITY_DATA_FILE "humidity_data.txt"
+#define LOG_FILE "/logs.txt"
+#define HEAT_DATA_FILE "/heat_data.txt"
+#define TEMPERATURE_DATA_FILE "/temperature_data.txt"
+#define HUMIDITY_DATA_FILE "/humidity_data.txt"
 
 void spiffs_init()
 {
@@ -63,16 +63,16 @@ void append_file(const char *path, const char *message)
     File file = SPIFFS.open(path, FILE_APPEND);
     if (!file)
     {
-        log("- failed to open file for appending");
+        Serial.println("- failed to open file for appending");
         return;
     }
     if (file.print(message))
     {
-        log("- message appended");
+        Serial.println("- message appended");
     }
     else
     {
-        log("- append failed");
+        Serial.println("- append failed");
     }
     file.close();
 }

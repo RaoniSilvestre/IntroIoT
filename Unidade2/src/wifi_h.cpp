@@ -1,7 +1,7 @@
 #include "esp_check.h"
 #include "config.h"
 #include "secrets.h"
-#include "wifi_handle.h"
+#include "wifi_h.h"
 #include "file_sys.h"
 
 WiFiClient wifi_client;
@@ -14,7 +14,7 @@ void wifi_init() {
     WiFi.setHostname(HOSTNAME);
     WiFi.begin(WIFI_SSID, WIFI_PASS);
 
-    while (wifi_connect != ESP_OK && attempts < WIFI_CONNECT_ATTEMPTS) {
+    while (wifi_connect() != ESP_OK && attempts < WIFI_CONNECT_ATTEMPTS) {
         log("Falha ao se conectar com a rede wifi");
         // XXX PÂNICO
         attempts++;
@@ -27,7 +27,7 @@ void wifi_init() {
 }
 
 esp_err_t wifi_connect() {
-    Serial.println(F("Conectando à rede wifi"));
+    log("Conectando à rede wifi");
 
     esp_err_t ret = ESP_OK;
 
