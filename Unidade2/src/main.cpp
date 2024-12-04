@@ -23,11 +23,18 @@ void vMqttTask(void *pvParameters)
     for (;;) {
         if (xQueueReceive(data_queue, &data_buffer, portMAX_DELAY) == pdTRUE) {
             mqtt_pool();
-            mqtt_publish(MQTT_TOPIC_TEMP,
-                         String(data_buffer.temperature).c_str());
-            mqtt_publish(MQTT_TOPIC_HUMI, String(data_buffer.humidity).c_str());
-            mqtt_publish(MQTT_TOPIC_HEAT,
-                         String(data_buffer.heat_index).c_str());
+
+            char *topic = mqtt_get_topic(MQTT_TOPIC_TEMP);
+            mqtt_publish(topic, String(data_buffer.temperature).c_str());
+            
+            free(topic);
+            topic = mqtt_get_topic(MQTT_TOPIC_HUMI);
+            mqtt_publish(topic, String(data_buffer.humidity).c_str());
+
+            free(topic);
+            topic = mqtt_get_topic(MQTT_TOPIC_HEAT);
+            mqtt_publish(topic, String(data_buffer.heat_index).c_str());
+            
             append_data(data_buffer.temperature, TEMPERATURE_TYPE);
             append_data(data_buffer.humidity, HUMIDITY_TYPE);
             append_data(data_buffer.heat_index, HEAT_TYPE);

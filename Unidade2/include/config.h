@@ -4,9 +4,9 @@
 
 #define CLIENT_ID HOSTNAME
 
-#define MQTT_TOPIC_TEMP "/lab201_logger_X/temperature"
-#define MQTT_TOPIC_HUMI "/lab201_logger_X/humidity"
-#define MQTT_TOPIC_HEAT "/lab201_logger_X/heat-index"
+#define MQTT_TOPIC_TEMP "/temperature"
+#define MQTT_TOPIC_HUMI "/humidity"
+#define MQTT_TOPIC_HEAT "/heat-index"
 
 #define WIFI_CONNECT_ATTEMPTS 3
 

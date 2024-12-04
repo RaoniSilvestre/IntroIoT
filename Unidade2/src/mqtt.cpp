@@ -62,6 +62,12 @@ err_pub:
     return ESP_FAIL;
 }
 
+char *mqtt_get_topic(const char *subtopic) {
+    char *topic = (char *)malloc(strlen(CLIENT_ID) + strlen(subtopic) + 1);
+    strcat(strcat(topic, CLIENT_ID), subtopic);
+    return topic;
+}
+
 void mqtt_pool() {
     mqtt_client.loop();
 }
