@@ -55,17 +55,23 @@ esp_err_t mqtt_publish(const char *topic, const char *payload) {
 
     ESP_GOTO_ON_FALSE(mqtt_client.publish(topic, payload), ESP_FAIL, err_pub, "MQTT", "Não foi possível publicar a mensagem");
     Serial.println((String("Publicação feita no tópico ") + String(topic)).c_str());
+    mqtt_disconnect();
     return ESP_OK;
 
 err_pub:
     // XXX PÂNICO
     log((String("Não foi possível publicar a mensagem no tópico ") + String(topic)).c_str());
+    mqtt_disconnect();
     return ESP_FAIL;
 }
 
 char *mqtt_get_topic(char *src, const char *subtopic) {
     strcat(strcat(src, CLIENT_ID), subtopic);
     return src;
+}
+
+void mqtt_disconnect() {
+    mqtt_client.disconnect();
 }
 
 void mqtt_pool() {
