@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "SPIFFS.h"
 #include "config.h"
 #include "file_sys.h"
@@ -6,7 +7,7 @@
 #include "mqtt_c.h"
 #include "sensor.h"
 #include "wifi_h.h"
-#include <Arduino.h>
+#include "ntp_s.h"
 
 #define DELAY_MS 10000
 
@@ -15,6 +16,8 @@ QueueHandle_t data_queue;
 void vMqttTask(void *pvParameters)
 {
     mqtt_init();
+    spiffs_init();
+    ntp_init();
 
     sensor_data_t data_buffer;
     char topic_buffer[64];
