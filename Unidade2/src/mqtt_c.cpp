@@ -11,7 +11,17 @@ PubSubClient mqtt_client(wifi_client);
 
 esp_err_t mqtt_init() {
     esp_err_t ret;
-    log("Iniciando cliente MQTT");
+    
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+        log("Falha ao obter a hora atual");
+        log("Iniciando cliente MQTT");
+    } else {
+        char buffer[128];
+        sprintf(buffer, "[%Y-%d-%d %H:%M:%S] ", &timeinfo);
+        strcat(buffer, "Iniciando cliente MQTT");
+        log(buffer);
+    }
 
     mqtt_client.setServer(MQTT_SERVER, MQTT_PORT);
     ret = ESP_OK;
@@ -41,7 +51,16 @@ esp_err_t mqtt_connect() {
     }
     
     // XXX PÂNICO
-    log("Conexão com o broker MQTT excedeu o tempo limite.");
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+        log("Falha ao obter a hora atual");
+        log("Conexão com o broker MQTT excedeu o tempo limite.");
+    } else {
+        char buffer[128];
+        sprintf(buffer, "[%Y-%d-%d %H:%M:%S] ", &timeinfo);
+        strcat(buffer, "Conexão com o broker MQTT excedeu o tempo limite.");
+        log(buffer);
+    }
     return ESP_ERR_TIMEOUT;
 }
 
@@ -49,7 +68,16 @@ esp_err_t mqtt_publish(const char *topic, const char *payload) {
     esp_err_t ret = ESP_OK;
     
     if (!mqtt_client.connected()) {
-        log("Sem conexão com o broker MQTT no momento de publicação de dados");
+        struct tm timeinfo;
+        if (!getLocalTime(&timeinfo)) {
+            log("Falha ao obter a hora atual");
+            log("Sem conexão com o broker MQTT no momento de publicação de dados");
+        } else {
+            char buffer[128];
+            sprintf(buffer, "[%Y-%d-%d %H:%M:%S] ", &timeinfo);
+            strcat(buffer, "Sem conexão com o broker MQTT no momento de publicação de dados");
+            log(buffer);
+        }
         ESP_RETURN_ON_ERROR(mqtt_connect(), "MQTT", "Falha ao se conectar ao broker mqtt para publicação");
     }
 
@@ -60,7 +88,16 @@ esp_err_t mqtt_publish(const char *topic, const char *payload) {
 
 err_pub:
     // XXX PÂNICO
-    log((String("Não foi possível publicar a mensagem no tópico ") + String(topic)).c_str());
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+        log("Falha ao obter a hora atual");
+        log((String("Não foi possível publicar a mensagem no tópico ") + String(topic)).c_str());
+    } else {
+        char buffer[128];
+        sprintf(buffer, "[%Y-%d-%d %H:%M:%S] ", &timeinfo);
+        strcat(buffer, (String("Não foi possível publicar a mensagem no tópico ") + String(topic)).c_str());
+        log(buffer);
+    }
     mqtt_disconnect();
     return ESP_FAIL;
 }

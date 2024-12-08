@@ -10,7 +10,7 @@
 
 void spiffs_init();
 
-void append_data(int value, int data_type);
+void append_data(float value, int data_type);
 void reset_data_file();
 int* get_values();
 void log(const char * message);

@@ -16,8 +16,6 @@ QueueHandle_t data_queue;
 void vMqttTask(void *pvParameters)
 {
     mqtt_init();
-    spiffs_init();
-    ntp_init();
 
     sensor_data_t data_buffer;
     char topic_buffer[64];
@@ -83,6 +81,7 @@ void setup()
     SPIFFS.format();
     spiffs_init();
     wifi_init();
+    ntp_init();
 
     data_queue = xQueueCreate(2, sizeof(sensor_data_t));
 

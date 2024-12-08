@@ -77,9 +77,19 @@ void append_file(const char *path, const char *message)
     file.close();
 }
 
-void append_data(int value, int data_type)
+void append_data(float value, int data_type)
 {
-    const char *formated_value = String(value).c_str();
+    char *formated_value;
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+        log("Falha ao obter a hora atual");    
+        sprintf(formated_value ,"%.2f", value);
+    } else {
+        char buffer[64];
+        sprintf(buffer, "[%Y-%d-%d %H:%M:%S] ", &timeinfo);
+        strcat(buffer, String(value).c_str());
+        strcat(formated_value, buffer);
+    }
 
     switch (data_type)
     {
