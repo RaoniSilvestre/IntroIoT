@@ -1,6 +1,7 @@
 #pragma once
 
 #include "esp_err.h"
+#include "file_sys.h"
 
 #define SENSOR_PIN GPIO_NUM_4
 #define SENSOR_TYPE DHT11

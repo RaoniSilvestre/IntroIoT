@@ -18,32 +18,37 @@ void vMqttTask(void *pvParameters)
     mqtt_init();
 
     sensor_data_t data_buffer;
-    char topic_buffer[64];
 
-    for (;;) {
-        if (xQueueReceive(data_queue, &data_buffer, portMAX_DELAY) == pdTRUE) {
-            if (mqtt_connect() == ESP_OK) {
+    for (;;)
+    {
+        if (xQueueReceive(data_queue, &data_buffer, portMAX_DELAY) == pdTRUE)
+        {
+            if (mqtt_connect() == ESP_OK)
+            {
                 mqtt_pool();
 
-                mqtt_get_topic(topic_buffer, MQTT_TOPIC_TEMP);
-                mqtt_publish(topic_buffer, String(52).c_str());
-                Serial.printf("watermark: %d\n",
-                              uxTaskGetStackHighWaterMark(NULL));
+                String temp_topic = mqtt_get_topic(MQTT_TOPIC_TEMP);
 
-                mqtt_get_topic(topic_buffer, MQTT_TOPIC_HUMI);
-                mqtt_publish(topic_buffer,
+                mqtt_publish(temp_topic.c_str(), String(52).c_str());
+                log(("Watermark: " + String(uxTaskGetStackHighWaterMark(NULL))).c_str());
+
+                String humi_topic = mqtt_get_topic(MQTT_TOPIC_HUMI);
+                mqtt_publish(humi_topic.c_str(),
                              String(data_buffer.humidity).c_str());
 
-                mqtt_get_topic(topic_buffer, MQTT_TOPIC_HEAT);
-                mqtt_publish(topic_buffer,
+                String heat_topic = mqtt_get_topic(MQTT_TOPIC_HEAT);
+                mqtt_publish(heat_topic.c_str(),
                              String(data_buffer.heat_index).c_str());
-            } else {
+            }
+            else
+            {
                 // XXX PÂNICO!
             }
 
             append_data(data_buffer.temperature, TEMPERATURE_TYPE);
             append_data(data_buffer.humidity, HUMIDITY_TYPE);
             append_data(data_buffer.heat_index, HEAT_TYPE);
+
             vTaskDelay(pdMS_TO_TICKS(DELAY_MS));
         }
     }
@@ -55,20 +60,15 @@ void vSensorTask(void *pvParameters)
     sensor_init();
     sensor_data_t data;
 
-    for (;;) {
-        if (sensor_get_data(&data) == ESP_OK) {
-            Serial.print(F(">Temperature: "));
-            Serial.println(data.temperature);
-
-            Serial.print(F(">Humidity: "));
-            Serial.println(data.humidity);
-
-            Serial.print(F(">Heat Index: "));
-            Serial.println(data.heat_index);
-
+    for (;;)
+    {
+        if (sensor_get_data(&data) == ESP_OK)
+        {
             xQueueSend(data_queue, &data, portMAX_DELAY);
-        } else {
-            Serial.println(F("PANICO!"));
+        }
+        else
+        {
+            log("PÂNICO");
         }
         vTaskDelay(pdMS_TO_TICKS(DELAY_MS));
     }

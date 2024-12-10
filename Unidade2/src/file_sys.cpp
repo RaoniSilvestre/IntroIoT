@@ -58,49 +58,48 @@ void write_file(const char *path, const char *message)
 
 void append_file(const char *path, const char *message)
 {
-    Serial.printf("Appending to file: %s\r\n", path);
+
+    struct tm timeinfo;
+    if(!getLocalTime(&timeinfo)) {
+        Serial.println("[ERROR] Failed to get current time when logging " + String(message));
+        return;
+    }
+
+    String bffr = "[" + String(timeinfo.tm_year) + "/" + String(timeinfo.tm_mon) + "/" + String(timeinfo.tm_mday);
+    bffr += " " + String(timeinfo.tm_hour) + ":" + String(timeinfo.tm_min) + ":" + String(timeinfo.tm_sec) + "]";
+    bffr += " " + String(message);
 
     File file = SPIFFS.open(path, FILE_APPEND);
     if (!file)
     {
-        Serial.println("- failed to open file for appending");
+        Serial.println("[ERROR] Failed to open file for appending");
         return;
     }
-    if (file.print(message))
+    if (!file.print(message))
     {
-        Serial.println("- message appended");
+        Serial.println("[ERROR] Append failed for " + String(bffr));
+    } else {
+        Serial.println("[LOG] " + bffr);
     }
-    else
-    {
-        Serial.println("- append failed");
-    }
+
+
     file.close();
 }
 
 void append_data(float value, int data_type)
 {
-    char *formated_value;
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo)) {
-        log("Falha ao obter a hora atual");    
-        sprintf(formated_value ,"%.2f", value);
-    } else {
-        char buffer[64];
-        sprintf(buffer, "[%Y-%d-%d %H:%M:%S] ", &timeinfo);
-        strcat(buffer, String(value).c_str());
-        strcat(formated_value, buffer);
-    }
+    const char* formattedValue = String(value).c_str();
 
     switch (data_type)
     {
     case TEMPERATURE_TYPE:
-        append_file(TEMPERATURE_DATA_FILE, formated_value);
+        append_file(TEMPERATURE_DATA_FILE, formattedValue);
         break;
     case HUMIDITY_TYPE:
-        append_file(HUMIDITY_DATA_FILE, formated_value);
+        append_file(HUMIDITY_DATA_FILE, formattedValue);
         break;
     case HEAT_TYPE:
-        append_file(HEAT_DATA_FILE, formated_value);
+        append_file(HEAT_DATA_FILE, formattedValue);
         break;
     default:
         break;
@@ -109,6 +108,5 @@ void append_data(float value, int data_type)
 
 void log(const char *message)
 {
-    Serial.println(message);
     append_file(LOG_FILE, message);
 }

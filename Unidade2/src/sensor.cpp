@@ -10,7 +10,6 @@ DHT sensor(SENSOR_PIN, SENSOR_TYPE);
 
 void sensor_init() {
     sensor.begin();
-    Serial.println("Sensor iniciado!");
 }
 
 esp_err_t sensor_get_data(sensor_data_t *sensor_data) {
@@ -21,7 +20,6 @@ esp_err_t sensor_get_data(sensor_data_t *sensor_data) {
     t = sensor.readTemperature();
     h = sensor.readHumidity();
     if (isnan(t) || isnan(h)) {
-        Serial.println("Falha na leitura do sensor");
         return ESP_FAIL;
     }
 
