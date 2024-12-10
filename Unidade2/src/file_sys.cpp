@@ -1,9 +1,9 @@
 #include <file_sys.h>
 
 #define LOG_FILE "/logs.txt"
-#define HEAT_DATA_FILE "/heat_data.txt"
-#define TEMPERATURE_DATA_FILE "/temperature_data.txt"
-#define HUMIDITY_DATA_FILE "/humidity_data.txt"
+#define HEAT_DATA_FILE "/heat.txt"
+#define TEMPERATURE_DATA_FILE "/temperature.txt"
+#define HUMIDITY_DATA_FILE "/humidity.txt"
 
 void spiffs_init()
 {
@@ -65,19 +65,19 @@ void append_file(const char *path, const char *message)
         return;
     }
 
-    String bffr = "[" + String(timeinfo.tm_year) + "/" + String(timeinfo.tm_mon) + "/" + String(timeinfo.tm_mday);
+    String bffr = "[" + String(timeinfo.tm_year + 1900) + "/" + String(timeinfo.tm_mon + 1) + "/" + String(timeinfo.tm_mday);
     bffr += " " + String(timeinfo.tm_hour) + ":" + String(timeinfo.tm_min) + ":" + String(timeinfo.tm_sec) + "]";
     bffr += " " + String(message);
 
     File file = SPIFFS.open(path, FILE_APPEND);
     if (!file)
     {
-        Serial.println("[ERROR] Failed to open file for appending");
+        Serial.println("[ERROR] Failed to open" + String(path) + " for appending");
         return;
     }
     if (!file.print(message))
     {
-        Serial.println("[ERROR] Append failed for " + String(bffr));
+        Serial.println("[ERROR] Append failed for " + String(bffr) + " on file " + String(path));
     } else {
         Serial.println("[LOG] " + bffr);
     }
@@ -88,8 +88,9 @@ void append_file(const char *path, const char *message)
 
 void append_data(float value, int data_type)
 {
-    const char* formattedValue = String(value).c_str();
 
+    String temp = String(value);
+    const char* formattedValue = temp.c_str();
     switch (data_type)
     {
     case TEMPERATURE_TYPE:

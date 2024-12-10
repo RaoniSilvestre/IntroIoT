@@ -1,6 +1,7 @@
 #pragma once
 
 #include "esp_err.h"
+#include <Arduino.h>
 
 esp_err_t mqtt_init();
 esp_err_t mqtt_connect();

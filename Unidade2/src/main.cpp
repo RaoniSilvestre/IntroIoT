@@ -23,11 +23,11 @@ void vMqttTask(void *pvParameters) {
       if (mqtt_connect() == ESP_OK) {
         mqtt_pool();
 
-        String temp_topic = mqtt_get_topic(MQTT_TOPIC_TEMP);
-
-        mqtt_publish(temp_topic.c_str(), String(52).c_str());
         log(("Watermark: " + String(uxTaskGetStackHighWaterMark(NULL)))
                 .c_str());
+
+        String temp_topic = mqtt_get_topic(MQTT_TOPIC_TEMP);
+        mqtt_publish(temp_topic.c_str(), String(52).c_str());
 
         String humi_topic = mqtt_get_topic(MQTT_TOPIC_HUMI);
         mqtt_publish(humi_topic.c_str(), String(data_buffer.humidity).c_str());
@@ -57,7 +57,6 @@ void vSensorTask(void *pvParameters) {
     if (sensor_get_data(&data) == ESP_OK) {
       xQueueSend(data_queue, &data, portMAX_DELAY);
     } else {
-      log("PÂNICO AO PEGAR DADOS");
     }
     vTaskDelay(pdMS_TO_TICKS(DELAY_MS));
   }

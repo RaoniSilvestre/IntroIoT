@@ -28,7 +28,7 @@ esp_err_t mqtt_connect() {
 
   uint32_t start = millis();
   while (!mqtt_client.connected() && millis() - start < MQTT_TIMEOUT_MS) {
-    log("MQTT Status: " + String(mqtt_client.state()));
+    log(("MQTT Status: " + String(mqtt_client.state())).c_str());
 
     if (mqtt_client.connect(CLIENT_ID, MQTT_USER, MQTT_KEY)) {
       log("MQTT conectado");
@@ -54,7 +54,6 @@ esp_err_t mqtt_publish(const char *topic, const char *payload) {
   ESP_GOTO_ON_FALSE(mqtt_client.publish(topic, payload), ESP_FAIL, err_pub,
                     "MQTT", "Não foi possível publicar a mensagem");
   log(("Publicação feita no tópico" + String(topic)).c_str());
-  mqtt_disconnect();
   return ESP_OK;
 
 err_pub:
@@ -72,3 +71,4 @@ String mqtt_get_topic(const char *subtopic) {
 void mqtt_disconnect() { mqtt_client.disconnect(); }
 
 void mqtt_pool() { mqtt_client.loop(); }
+
