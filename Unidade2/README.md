@@ -90,3 +90,8 @@ O arquivo `file_sys.cpp` manipula arquivos locais no dispositivo, permitindo arm
 6. Multithreading
 
 No arquivo `main.cpp` em vez de usar um loop normal, está sendo utilizado o multithreading para separar a parte de leitura de dados do sensor e o envio de dados ao MQTT.
+
+## Funcionamento
+
+
+https://drive.google.com/file/d/16oBbHonVXMyukKMgPK28yyqJM1QnP-bB/view?usp=drivesdk
