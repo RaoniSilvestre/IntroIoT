@@ -9,6 +9,8 @@
 #include "wifi_h.h"
 #include <Arduino.h>
 
+#define LED_BUILTIN 2
+
 #define DELAY_MS 10000
 
 QueueHandle_t data_queue;
@@ -55,8 +57,10 @@ void vSensorTask(void *pvParameters) {
 
   for (;;) {
     if (sensor_get_data(&data) == ESP_OK) {
+      digitalWrite(LED_BUILTIN, LOW);
       xQueueSend(data_queue, &data, portMAX_DELAY);
     } else {
+      digitalWrite(LED_BUILTIN, HIGH);
     }
     vTaskDelay(pdMS_TO_TICKS(DELAY_MS));
   }
@@ -65,10 +69,11 @@ void vSensorTask(void *pvParameters) {
 
 void setup() {
   Serial.begin(115200);
-  SPIFFS.format();
   spiffs_init();
   wifi_init();
   ntp_init();
+
+  pinMode(LED_BUILTIN, OUTPUT);
 
   data_queue = xQueueCreate(2, sizeof(sensor_data_t));
 
